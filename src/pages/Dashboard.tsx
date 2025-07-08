@@ -76,7 +76,7 @@ const Dashboard = () => {
       case "processing":
         return "bg-info text-white";
       default:
-        return "bg-muted text-muted-foreground";
+        return "bg-zinc-200 text-muted-foreground";
     }
   };
 
@@ -127,7 +127,7 @@ const Dashboard = () => {
                 {topProducts.map((product, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                    className="flex items-center justify-between p-3 bg-zinc-200 rounded-lg"
                   >
                     <div>
                       <p className="font-medium">{product.name}</p>
@@ -158,7 +158,7 @@ const Dashboard = () => {
                 {recentOrders.map((order, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                    className="flex items-center justify-between p-3 bg-zinc-200 rounded-lg"
                   >
                     <div>
                       <p className="font-medium">{order.id}</p>

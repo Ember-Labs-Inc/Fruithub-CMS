@@ -13,7 +13,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-primary">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4 text-primary">GroceryCMS</h1>
+        <h1 className="text-4xl font-bold mb-4 text-primary">Fruithub CMS</h1>
         <p className="text-xl text-muted-foreground">Loading...</p>
       </div>
     </div>

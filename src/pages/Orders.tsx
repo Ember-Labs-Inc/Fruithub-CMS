@@ -91,7 +91,7 @@ const Orders = () => {
       case "cancelled":
         return "bg-destructive text-white";
       default:
-        return "bg-muted text-muted-foreground";
+        return "bg-zinc-200 text-muted-foreground";
     }
   };
 
@@ -145,7 +145,7 @@ const Orders = () => {
                     {/* Customer Info */}
                     <div>
                       <h4 className="font-semibold mb-2">Customer Information</h4>
-                      <div className="bg-muted p-4 rounded-lg space-y-2">
+                      <div className="bg-zinc-200 p-4 rounded-lg space-y-2">
                         <p><strong>Name:</strong> {selectedOrder.customer}</p>
                         <p><strong>Email:</strong> {selectedOrder.email}</p>
                         <p><strong>Phone:</strong> {selectedOrder.phone}</p>
@@ -158,7 +158,7 @@ const Orders = () => {
                       <h4 className="font-semibold mb-2">Order Items</h4>
                       <div className="space-y-2">
                         {selectedOrder.items.map((item: any, index: number) => (
-                          <div key={index} className="flex justify-between items-center p-3 bg-muted rounded-lg">
+                          <div key={index} className="flex justify-between items-center p-3 bg-zinc-200 rounded-lg">
                             <div>
                               <p className="font-medium">{item.name}</p>
                               <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>

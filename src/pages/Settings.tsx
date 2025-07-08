@@ -104,7 +104,7 @@ const Settings = () => {
   };
 
   const getStatusColor = (status: string) => {
-    return status === "active" ? "bg-success text-white" : "bg-muted text-muted-foreground";
+    return status === "active" ? "bg-success text-white" : "bg-zinc-200 text-muted-foreground";
   };
 
   return (
@@ -136,6 +136,7 @@ const Settings = () => {
                         id="businessName"
                         value={businessInfo.name}
                         onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})}
+                        className="bg-zinc-200"
                       />
                     </div>
 
@@ -146,6 +147,7 @@ const Settings = () => {
                         type="email"
                         value={businessInfo.email}
                         onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})}
+                        className="bg-zinc-200"
                       />
                     </div>
 
@@ -155,6 +157,7 @@ const Settings = () => {
                         id="businessPhone"
                         value={businessInfo.phone}
                         onChange={(e) => setBusinessInfo({...businessInfo, phone: e.target.value})}
+                        className="bg-zinc-200"
                       />
                     </div>
 
@@ -165,6 +168,7 @@ const Settings = () => {
                         value={businessInfo.address}
                         onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})}
                         rows={3}
+                        className="bg-zinc-200"
                       />
                     </div>
                   </div>
@@ -177,6 +181,7 @@ const Settings = () => {
                         value={businessInfo.description}
                         onChange={(e) => setBusinessInfo({...businessInfo, description: e.target.value})}
                         rows={6}
+                        className="bg-zinc-200"
                       />
                     </div>
 
@@ -212,7 +217,7 @@ const Settings = () => {
                     <div>
                       <Label htmlFor="currency">Currency</Label>
                       <Select value={appConfig.currency} onValueChange={(value) => setAppConfig({...appConfig, currency: value})}>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-zinc-200">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -231,6 +236,7 @@ const Settings = () => {
                         value={appConfig.deliveryFee}
                         onChange={(e) => setAppConfig({...appConfig, deliveryFee: e.target.value})}
                         placeholder="5.99"
+                        className="bg-zinc-200"
                       />
                     </div>
 
@@ -241,6 +247,7 @@ const Settings = () => {
                         value={appConfig.freeDeliveryThreshold}
                         onChange={(e) => setAppConfig({...appConfig, freeDeliveryThreshold: e.target.value})}
                         placeholder="50.00"
+                        className="bg-zinc-200"
                       />
                     </div>
                   </div>
@@ -253,6 +260,7 @@ const Settings = () => {
                         value={appConfig.taxRate}
                         onChange={(e) => setAppConfig({...appConfig, taxRate: e.target.value})}
                         placeholder="8.5"
+                        className="bg-zinc-200"
                       />
                     </div>
 
@@ -263,6 +271,7 @@ const Settings = () => {
                         value={appConfig.operatingHours}
                         onChange={(e) => setAppConfig({...appConfig, operatingHours: e.target.value})}
                         placeholder="8:00 AM - 10:00 PM"
+                        className="bg-zinc-200"
                       />
                     </div>
 
@@ -273,6 +282,7 @@ const Settings = () => {
                         value={appConfig.orderCutoffTime}
                         onChange={(e) => setAppConfig({...appConfig, orderCutoffTime: e.target.value})}
                         placeholder="9:30 PM"
+                        className="bg-zinc-200"
                       />
                     </div>
                   </div>
@@ -308,6 +318,7 @@ const Settings = () => {
                         value={newAdmin.name}
                         onChange={(e) => setNewAdmin({...newAdmin, name: e.target.value})}
                         placeholder="Enter full name"
+                        className="bg-zinc-200"
                       />
                     </div>
                     <div>
@@ -318,12 +329,13 @@ const Settings = () => {
                         value={newAdmin.email}
                         onChange={(e) => setNewAdmin({...newAdmin, email: e.target.value})}
                         placeholder="Enter email address"
+                        className="bg-zinc-200"
                       />
                     </div>
                     <div>
                       <Label htmlFor="adminRole">Role</Label>
                       <Select value={newAdmin.role} onValueChange={(value) => setNewAdmin({...newAdmin, role: value})}>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-zinc-200">
                           <SelectValue placeholder="Select role" />
                         </SelectTrigger>
                         <SelectContent>
@@ -349,7 +361,7 @@ const Settings = () => {
               <CardContent>
                 <div className="space-y-4">
                   {adminUsers.map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                    <div key={user.id} className="flex items-center justify-between p-4 bg-zinc-200 rounded-lg">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
                           {user.name.split(' ').map(n => n[0]).join('')}
@@ -390,7 +402,7 @@ const Settings = () => {
               <CardContent>
                 <div className="space-y-6">
                   {notificationSettings.map((setting) => (
-                    <div key={setting.id} className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                    <div key={setting.id} className="flex items-center justify-between p-4 bg-zinc-200 rounded-lg">
                       <div className="space-y-1">
                         <h3 className="font-semibold">{setting.label}</h3>
                         <p className="text-sm text-muted-foreground">{setting.description}</p>
@@ -405,11 +417,11 @@ const Settings = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="senderName">Sender Name</Label>
-                      <Input id="senderName" defaultValue="FreshMart Grocery" />
+                      <Input id="senderName" defaultValue="FreshMart Grocery" className="bg-zinc-200"/>
                     </div>
                     <div>
                       <Label htmlFor="senderEmail">Sender Email</Label>
-                      <Input id="senderEmail" defaultValue="noreply@freshmart.com" />
+                      <Input id="senderEmail" defaultValue="noreply@freshmart.com" className="bg-zinc-200"/>
                     </div>
                   </div>
                 </div>

@@ -1,14 +1,30 @@
-
 import { useState } from "react";
 import { CMSLayout } from "../components/CMSLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../components/ui/dialog";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 import { toast } from "../hooks/use-toast";
 
 const Products = () => {
@@ -60,11 +76,19 @@ const Products = () => {
     },
   ];
 
-  const categories = ["Fruits", "Vegetables", "Dairy", "Meat", "Bakery", "Snacks"];
+  const categories = [
+    "Fruits",
+    "Vegetables",
+    "Dairy",
+    "Meat",
+    "Bakery",
+    "Snacks",
+  ];
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status: string) => {
@@ -76,7 +100,7 @@ const Products = () => {
       case "out_of_stock":
         return "bg-destructive text-white";
       default:
-        return "bg-muted text-muted-foreground";
+        return "bg-zinc-200 text-muted-foreground";
     }
   };
 
@@ -138,17 +162,22 @@ const Products = () => {
                     <Input
                       id="name"
                       value={newProduct.name}
-                      onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                      onChange={(e) =>
+                        setNewProduct({ ...newProduct, name: e.target.value })
+                      }
                       placeholder="Enter product name"
+                      className="bg-zinc-200"
                     />
                   </div>
                   <div>
                     <Label htmlFor="category">Category *</Label>
-                    <Select 
+                    <Select
                       value={newProduct.category}
-                      onValueChange={(value) => setNewProduct({...newProduct, category: value})}
+                      onValueChange={(value) =>
+                        setNewProduct({ ...newProduct, category: value })
+                      }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-zinc-200">
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
@@ -166,8 +195,14 @@ const Products = () => {
                       <Input
                         id="price"
                         value={newProduct.price}
-                        onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
+                        onChange={(e) =>
+                          setNewProduct({
+                            ...newProduct,
+                            price: e.target.value,
+                          })
+                        }
                         placeholder="$0.00"
+                        className="bg-zinc-200"
                       />
                     </div>
                     <div>
@@ -176,8 +211,14 @@ const Products = () => {
                         id="stock"
                         type="number"
                         value={newProduct.stock}
-                        onChange={(e) => setNewProduct({...newProduct, stock: e.target.value})}
+                        onChange={(e) =>
+                          setNewProduct({
+                            ...newProduct,
+                            stock: e.target.value,
+                          })
+                        }
                         placeholder="0"
+                        className="bg-zinc-200"
                       />
                     </div>
                   </div>
@@ -186,11 +227,20 @@ const Products = () => {
                     <Textarea
                       id="description"
                       value={newProduct.description}
-                      onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
+                      onChange={(e) =>
+                        setNewProduct({
+                          ...newProduct,
+                          description: e.target.value,
+                        })
+                      }
                       placeholder="Product description..."
+                      className="bg-zinc-200"
                     />
                   </div>
-                  <Button onClick={handleAddProduct} className="w-full bg-primary hover:bg-primary-hover">
+                  <Button
+                    onClick={handleAddProduct}
+                    className="w-full bg-primary hover:bg-primary-hover"
+                  >
                     Add Product
                   </Button>
                 </div>
@@ -202,7 +252,10 @@ const Products = () => {
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
-            <Card key={product.id} className="hover:shadow-lg transition-shadow">
+            <Card
+              key={product.id}
+              className="hover:shadow-lg transition-shadow"
+            >
               <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
                   <div className="text-4xl">{product.image}</div>
@@ -214,9 +267,13 @@ const Products = () => {
               <CardContent>
                 <div className="space-y-2">
                   <h3 className="font-semibold text-lg">{product.name}</h3>
-                  <p className="text-sm text-muted-foreground">{product.category}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {product.category}
+                  </p>
                   <div className="flex justify-between items-center">
-                    <span className="text-xl font-bold text-primary">{product.price}</span>
+                    <span className="text-xl font-bold text-primary">
+                      {product.price}
+                    </span>
                     <span className="text-sm text-muted-foreground">
                       Stock: {product.stock}
                     </span>
@@ -238,7 +295,9 @@ const Products = () => {
         {filteredProducts.length === 0 && (
           <Card>
             <CardContent className="text-center py-8">
-              <p className="text-muted-foreground">No products found matching your search.</p>
+              <p className="text-muted-foreground">
+                No products found matching your search.
+              </p>
             </CardContent>
           </Card>
         )}

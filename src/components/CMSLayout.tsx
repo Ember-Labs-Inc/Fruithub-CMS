@@ -23,7 +23,7 @@ export function CMSLayout({ children, title, description }: CMSLayoutProps) {
         </div>
       </div>
     </header>
-    <div className="flex-1 p-6 bg-zinc-300">
+    <div className="flex-1 p-6 bg-zinc-200">
           {children}
     </div>
   </main>

@@ -88,9 +88,9 @@ const Customers = () => {
       case "vip":
         return "bg-secondary text-secondary-foreground";
       case "inactive":
-        return "bg-muted text-muted-foreground";
+        return "bg-zinc-200 text-muted-foreground";
       default:
-        return "bg-muted text-muted-foreground";
+        return "bg-zinc-200 text-muted-foreground";
     }
   };
 
@@ -248,7 +248,7 @@ const Customers = () => {
                                   <h4 className="font-semibold mb-3">Recent Orders</h4>
                                   <div className="space-y-2">
                                     {selectedCustomer.recentOrders.map((order: any, index: number) => (
-                                      <div key={index} className="flex justify-between items-center p-3 bg-muted rounded-lg">
+                                      <div key={index} className="flex justify-between items-center p-3 bg-zinc-200 rounded-lg">
                                         <div>
                                           <p className="font-medium">{order.id}</p>
                                           <p className="text-sm text-muted-foreground">{order.date}</p>

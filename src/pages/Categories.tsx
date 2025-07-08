@@ -66,6 +66,7 @@ const Categories = () => {
                     value={newCategory.name}
                     onChange={(e) => setNewCategory({...newCategory, name: e.target.value})}
                     placeholder="Enter category name"
+                    className="bg-zinc-200"
                   />
                 </div>
                 <div>
@@ -75,6 +76,7 @@ const Categories = () => {
                     value={newCategory.icon}
                     onChange={(e) => setNewCategory({...newCategory, icon: e.target.value})}
                     placeholder="🍎"
+                    className="bg-zinc-200"
                   />
                 </div>
                 <Button onClick={handleAddCategory} className="w-full bg-primary hover:bg-primary-hover">

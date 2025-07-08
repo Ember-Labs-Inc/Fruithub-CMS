@@ -97,7 +97,7 @@ const Reports = () => {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                   {salesData.map((data, index) => (
-                    <div key={index} className="text-center p-4 bg-muted rounded-lg">
+                    <div key={index} className="text-center p-4 bg-zinc-200 rounded-lg">
                       <h3 className="font-semibold text-lg mb-2">{data.period}</h3>
                       <div className="space-y-2">
                         <div>
@@ -125,7 +125,7 @@ const Reports = () => {
                 <CardTitle>📈 Revenue Trend</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
+                <div className="h-64 bg-zinc-200 rounded-lg flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-4xl mb-4">📊</div>
                     <p className="text-muted-foreground">Revenue chart would be displayed here</p>
@@ -145,7 +145,7 @@ const Reports = () => {
               <CardContent>
                 <div className="space-y-4">
                   {topProducts.map((product, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-4 bg-zinc-200 rounded-lg">
                       <div className="flex items-center gap-4">
                         <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold">
                           {index + 1}
@@ -171,7 +171,7 @@ const Reports = () => {
                 <CardTitle>📊 Product Performance</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
+                <div className="h-64 bg-zinc-200 rounded-lg flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-4xl mb-4">📈</div>
                     <p className="text-muted-foreground">Product performance chart would be displayed here</p>
@@ -190,7 +190,7 @@ const Reports = () => {
               <CardContent>
                 <div className="space-y-4">
                   {categoryPerformance.map((category, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-4 bg-zinc-200 rounded-lg">
                       <div className="flex items-center gap-4">
                         <div>
                           <h3 className="font-semibold">{category.category}</h3>
@@ -217,7 +217,7 @@ const Reports = () => {
                 <CardTitle>🥧 Category Distribution</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
+                <div className="h-64 bg-zinc-200 rounded-lg flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-4xl mb-4">🥧</div>
                     <p className="text-muted-foreground">Category distribution pie chart would be displayed here</p>
@@ -276,7 +276,7 @@ const Reports = () => {
                 <CardTitle>📊 Customer Behavior Analysis</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
+                <div className="h-64 bg-zinc-200 rounded-lg flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-4xl mb-4">👥</div>
                     <p className="text-muted-foreground">Customer behavior analytics would be displayed here</p>

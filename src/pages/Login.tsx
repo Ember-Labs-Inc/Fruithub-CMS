@@ -6,6 +6,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { toast } from "../hooks/use-toast";
+import api from "../utils/api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -14,36 +15,49 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  e.preventDefault();
+  setIsLoading(true);
 
-    // Simulate login
-    setTimeout(() => {
-      if (email && password) {
-        toast({
-          title: "Login Successful",
-          description: "Welcome to GroceryCMS!",
-        });
-        navigate("/dashboard");
-      } else {
-        toast({
-          title: "Login Failed",
-          description: "Please enter valid credentials.",
-          variant: "destructive",
-        });
-      }
-      setIsLoading(false);
-    }, 1000);
-  };
+  try {
+    const response = await api.post("/users/login", {
+      email,
+      password,
+    });
+
+    console.log("Login Response: ", response);
+
+    const user = response.data;
+
+    toast({
+      title: "Login Successful",
+      description: `Welcome ${user.name || "admin"}!`,
+      variant: "successful"
+    });
+
+    // Optional: store user or token in localStorage
+    // localStorage.setItem("user", JSON.stringify(user));
+
+    navigate("/dashboard");
+  } catch (error: any) {
+    toast({
+      title: "Login Failed",
+      description: error.response?.data?.message || "Invalid credentials",
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted px-4">
+    <div className="min-h-screen flex items-center justify-center bg-zinc-200 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl font-bold text-white">🛒</span>
           </div>
-          <h1 className="text-3xl font-bold text-primary">GroceryCMS</h1>
+          <h1 className="text-3xl font-bold text-primary">Fruithub CMS</h1>
           <p className="text-muted-foreground">Admin Dashboard</p>
         </div>
 
@@ -61,10 +75,11 @@ const Login = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@grocery.com"
+                  placeholder="admin@fruithub.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className="bg-zinc-200"
                 />
               </div>
               <div className="space-y-2">
@@ -76,6 +91,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className="bg-zinc-200"
                 />
               </div>
               <div className="flex items-center justify-between">
