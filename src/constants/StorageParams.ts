@@ -1,5 +1,7 @@
 const StorageParams = {
   CACHED_PRODUCTS: "CACHED_PRODUCTS",
+  CACHED_CATEGORIES: "CACHED_CATEGORIES",
+  CACHED_ORDERS: "CACHED_ORDERS",
 };
 
 export default StorageParams;

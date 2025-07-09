@@ -1,12 +1,12 @@
 // hooks/useProducts.ts
 
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { useEffect, useCallback } from "react";
-import { loadProducts } from "@/store/productSlice";
+import { loadProducts } from "../redux/slices/productSlice";
 
 export function useReduxProducts({ includeArchived = false } = {}) {
   const dispatch = useAppDispatch();
-  const { products, status, error } = useAppSelector((state) => state.products);
+  const { products, status, error } = useAppSelector((state) => state.product);
 
   const reload = useCallback(() => {
     dispatch(loadProducts());

@@ -26,70 +26,51 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { toast } from "../hooks/use-toast";
+import api from "../utils/api";
+import { useReduxCategories } from "../hooks/useReduxCategory";
+import { useReduxProducts } from "../hooks/useReduxProduct";
+import { useReduxAuth } from "../hooks/useReduxAuth";
+import { Uploader } from "../components/ui/uploader";
 
 const Products = () => {
+  const { user } = useReduxAuth();
+  const { categories, reload } = useReduxCategories();
+  const { products } = useReduxProducts(); // Assuming you have a hook to fetch products
   const [searchTerm, setSearchTerm] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [newProduct, setNewProduct] = useState({
-    name: "",
-    category: "",
+    title: "",
+    slug: "",
+    categoryId: "",
     price: "",
     stock: "",
     description: "",
+    images: "",
+    status: "active",
   });
-
-  const products = [
-    {
-      id: 1,
-      name: "Organic Milk",
-      category: "Dairy",
-      price: "$3.99",
-      stock: 12,
-      status: "active",
-      image: "🥛",
-    },
-    {
-      id: 2,
-      name: "Fresh Bread",
-      category: "Bakery",
-      price: "$2.49",
-      stock: 25,
-      status: "active",
-      image: "🍞",
-    },
-    {
-      id: 3,
-      name: "Bananas",
-      category: "Fruits",
-      price: "$1.99",
-      stock: 8,
-      status: "low_stock",
-      image: "🍌",
-    },
-    {
-      id: 4,
-      name: "Ground Beef",
-      category: "Meat",
-      price: "$8.99",
-      stock: 0,
-      status: "out_of_stock",
-      image: "🥩",
-    },
-  ];
-
-  const categories = [
-    "Fruits",
-    "Vegetables",
-    "Dairy",
-    "Meat",
-    "Bakery",
-    "Snacks",
-  ];
 
   const filteredProducts = products.filter(
     (product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase())
+      product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.categoryId.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const getImageUrl = (path: string) => {
+    const baseUrl = import.meta.env.VITE_BASE_URL.replace(/\/api\/v1\/?$/, "");
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+    return `${baseUrl}${normalizedPath}`;
+  };
+
+  function generateUniqueSlug(title: string): string {
+    const baseSlug = title
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
+
+    return `${baseSlug}-${Date.now()}`; // or use nanoid() for randomness
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -104,28 +85,35 @@ const Products = () => {
     }
   };
 
-  const handleAddProduct = () => {
-    if (!newProduct.name || !newProduct.category || !newProduct.price) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields.",
-        variant: "destructive",
-      });
+  const handleAddProduct = async () => {
+    if (!user) {
+      toast({ title: "User not authenticated", variant: "destructive" });
       return;
     }
 
-    toast({
-      title: "Product Added",
-      description: `${newProduct.name} has been added successfully.`,
-    });
+    try {
+      const payload = {
+        title: newProduct.title,
+        slug: generateUniqueSlug(newProduct.title),
+        categoryId: newProduct.categoryId,
+        price: parseFloat(newProduct.price),
+        stock: parseInt(newProduct.stock),
+        description: newProduct.description,
+        images: newProduct.images
+          .split(",")
+          .map((url) => url.trim())
+          .filter(Boolean),
+        status: newProduct.status,
+        createdById: user.id,
+      };
 
-    setNewProduct({
-      name: "",
-      category: "",
-      price: "",
-      stock: "",
-      description: "",
-    });
+      const res = await api.post("/products", payload);
+      setDialogOpen(false);
+      toast({ title: "Product added successfully", variant: "successful" });
+      reload();
+    } catch (err) {
+      toast({ title: "Failed to add product", variant: "destructive" });
+    }
   };
 
   return (
@@ -146,9 +134,12 @@ const Products = () => {
           </div>
           <div className="flex gap-2">
             <Button variant="outline">Import CSV</Button>
-            <Dialog>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-primary hover:bg-primary-hover">
+                <Button
+                  className="bg-primary hover:bg-primary-hover"
+                  onClick={() => setDialogOpen(true)}
+                >
                   Add Product
                 </Button>
               </DialogTrigger>
@@ -157,24 +148,32 @@ const Products = () => {
                   <DialogTitle>Add New Product</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
+                  {/* Title */}
                   <div>
-                    <Label htmlFor="name">Product Name *</Label>
+                    <Label htmlFor="title">Product Title *</Label>
                     <Input
-                      id="name"
-                      value={newProduct.name}
-                      onChange={(e) =>
-                        setNewProduct({ ...newProduct, name: e.target.value })
-                      }
-                      placeholder="Enter product name"
+                      id="title"
+                      value={newProduct.title}
+                      onChange={(e) => {
+                        const title = e.target.value;
+                        setNewProduct((prev) => ({
+                          ...prev,
+                          title,
+                          slug: generateUniqueSlug(title),
+                        }));
+                      }}
+                      placeholder="Enter product title"
                       className="bg-zinc-200"
                     />
                   </div>
+
+                  {/* Category Select */}
                   <div>
                     <Label htmlFor="category">Category *</Label>
                     <Select
-                      value={newProduct.category}
+                      value={newProduct.categoryId}
                       onValueChange={(value) =>
-                        setNewProduct({ ...newProduct, category: value })
+                        setNewProduct({ ...newProduct, categoryId: value })
                       }
                     >
                       <SelectTrigger className="bg-zinc-200">
@@ -182,18 +181,21 @@ const Products = () => {
                       </SelectTrigger>
                       <SelectContent>
                         {categories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name} {category.image}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
+
+                  {/* Price and Stock */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="price">Price *</Label>
                       <Input
                         id="price"
+                        type="number"
                         value={newProduct.price}
                         onChange={(e) =>
                           setNewProduct({
@@ -201,7 +203,7 @@ const Products = () => {
                             price: e.target.value,
                           })
                         }
-                        placeholder="$0.00"
+                        placeholder="UGX.0.00"
                         className="bg-zinc-200"
                       />
                     </div>
@@ -222,6 +224,31 @@ const Products = () => {
                       />
                     </div>
                   </div>
+
+                  {/* Status */}
+                  <div>
+                    <Label htmlFor="status">Status</Label>
+                    <Select
+                      value={newProduct.status}
+                      onValueChange={(value) =>
+                        setNewProduct({ ...newProduct, status: value })
+                      }
+                    >
+                      <SelectTrigger className="bg-zinc-200">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="archived">Archived</SelectItem>
+                        <SelectItem value="low_stock">Low Stock</SelectItem>
+                        <SelectItem value="out_of_stock">
+                          Out of Stock
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Description */}
                   <div>
                     <Label htmlFor="description">Description</Label>
                     <Textarea
@@ -237,6 +264,18 @@ const Products = () => {
                       className="bg-zinc-200"
                     />
                   </div>
+
+                  {/* Image Upload */}
+                  <div>
+                    <Label htmlFor="image">Product Image *</Label>
+                    <Uploader
+                      onUploaded={(path) =>
+                        setNewProduct({ ...newProduct, images: path })
+                      }
+                    />
+                  </div>
+
+                  {/* Submit */}
                   <Button
                     onClick={handleAddProduct}
                     className="w-full bg-primary hover:bg-primary-hover"
@@ -258,7 +297,13 @@ const Products = () => {
             >
               <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
-                  <div className="text-4xl">{product.image}</div>
+                  <div className="w-full h-40 overflow-hidden rounded-md">
+                    <img
+                      src={getImageUrl(product.images[0])}
+                      alt={product.title}
+                      className="w-full h-40 object-cover rounded-md"
+                    />
+                  </div>
                   <Badge className={getStatusColor(product.status)}>
                     {product.status.replace("_", " ")}
                   </Badge>
@@ -266,14 +311,17 @@ const Products = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <h3 className="font-semibold text-lg">{product.name}</h3>
+                  <h3 className="font-semibold text-lg">{product.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {product.category}
+                    {categories.find((cat) => cat.id === product.categoryId)
+                      ?.name || "Unknown"}
                   </p>
+
                   <div className="flex justify-between items-center">
                     <span className="text-xl font-bold text-primary">
-                      {product.price}
+                      UGX {product.price.toLocaleString()}
                     </span>
+
                     <span className="text-sm text-muted-foreground">
                       Stock: {product.stock}
                     </span>

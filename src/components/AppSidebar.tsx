@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -11,12 +10,7 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "../components/ui/sidebar";
-import {
-  Package,
-  Users,
-  Bell,
-  Settings,
-} from "lucide-react";
+import { Package, Users, Bell, Settings } from "lucide-react";
 
 const menuItems = [
   {
@@ -84,10 +78,14 @@ export function AppSidebar() {
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
+                  <SidebarMenuButton
+                    asChild
                     isActive={location.pathname === item.url}
-                    className={location.pathname === item.url ? "bg-yellow-400 text-black hover:bg-yellow-500" : ""}
+                    className={
+                      location.pathname === item.url
+                        ? "text-accent-foreground transition-colors duration-200"
+                        : "transition-colors duration-200"
+                    }
                   >
                     <Link to={item.url} className="flex items-center gap-2">
                       {typeof item.icon === "string" ? (

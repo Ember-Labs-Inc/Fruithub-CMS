@@ -7,10 +7,21 @@ import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
 import { Avatar, AvatarFallback } from "../components/ui/avatar";
+import { useReduxStats } from "../hooks/useReduxStats";
 
 const Customers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+
+  const {
+  totalCustomers,
+  activeUsers,
+  vipCustomers,
+  avgCustomerValue,
+  loading,
+  reload,
+} = useReduxStats();
+
 
   const customers = [
     {
@@ -44,39 +55,6 @@ const Customers = () => {
       recentOrders: [
         { id: "#ORD-009", date: "2024-01-12", amount: "$67.25", status: "delivered" },
         { id: "#ORD-006", date: "2024-01-08", amount: "$45.30", status: "delivered" },
-      ],
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike@example.com",
-      phone: "+1234567892",
-      orderCount: 22,
-      totalSpent: "$789.25",
-      status: "vip",
-      joinDate: "2023-05-10",
-      lastOrder: "2024-01-14",
-      address: "789 Pine St, City, State 12345",
-      recentOrders: [
-        { id: "#ORD-011", date: "2024-01-14", amount: "$156.20", status: "delivered" },
-        { id: "#ORD-007", date: "2024-01-09", amount: "$89.75", status: "delivered" },
-        { id: "#ORD-004", date: "2024-01-03", amount: "$124.50", status: "delivered" },
-      ],
-    },
-    {
-      id: 4,
-      name: "Emily Davis",
-      email: "emily@example.com",
-      phone: "+1234567893",
-      orderCount: 3,
-      totalSpent: "$98.40",
-      status: "inactive",
-      joinDate: "2023-12-01",
-      lastOrder: "2023-12-20",
-      address: "321 Elm St, City, State 12345",
-      recentOrders: [
-        { id: "#ORD-002", date: "2023-12-20", amount: "$34.80", status: "delivered" },
-        { id: "#ORD-001", date: "2023-12-15", amount: "$42.60", status: "cancelled" },
       ],
     },
   ];
@@ -131,25 +109,25 @@ const Customers = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card>
             <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-primary">247</div>
+              <div className="text-3xl font-bold text-primary">{totalCustomers}</div>
               <div className="text-sm text-muted-foreground">Total Customers</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-success">189</div>
+              <div className="text-3xl font-bold text-success">{activeUsers}</div>
               <div className="text-sm text-muted-foreground">Active Users</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-secondary">24</div>
+              <div className="text-3xl font-bold text-secondary">{vipCustomers}</div>
               <div className="text-sm text-muted-foreground">VIP Customers</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-info">$12.5K</div>
+              <div className="text-3xl font-bold text-info">UGX.{avgCustomerValue}</div>
               <div className="text-sm text-muted-foreground">Avg. Customer Value</div>
             </CardContent>
           </Card>

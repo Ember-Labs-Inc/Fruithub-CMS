@@ -1,54 +1,59 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 import { toast } from "../hooks/use-toast";
 import api from "../utils/api";
+import { useReduxAuth } from "../hooks/useReduxAuth";
+import { login } from "../redux/slices/authSlice";
+import { useAppDispatch } from "../redux/hooks";
 
 const Login = () => {
+  const { signin } = useReduxAuth();
+  const dispatch = useAppDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setIsLoading(true);
+    e.preventDefault();
+    setIsLoading(true);
 
-  try {
-    const response = await api.post("/users/login", {
-      email,
-      password,
-    });
+    try {
+      const result = await signin(email, password);
 
-    console.log("Login Response: ", response);
+      if (login.fulfilled.match(result)) {
+        const user = result.payload;
 
-    const user = response.data;
+        toast({
+          title: "Login Successful",
+          description: `Welcome ${user.name || "admin"}!`,
+          variant: "successful",
+        });
 
-    toast({
-      title: "Login Successful",
-      description: `Welcome ${user.name || "admin"}!`,
-      variant: "successful"
-    });
-
-    // Optional: store user or token in localStorage
-    // localStorage.setItem("user", JSON.stringify(user));
-
-    navigate("/dashboard");
-  } catch (error: any) {
-    toast({
-      title: "Login Failed",
-      description: error.response?.data?.message || "Invalid credentials",
-      variant: "destructive",
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+        navigate("/dashboard");
+      } else {
+        throw new Error((result.payload as string) || "Login failed");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Login Failed",
+        description: error.message || "Invalid credentials",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-200 px-4">
@@ -95,11 +100,7 @@ const Login = () => {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Button
-                  type="button"
-                  variant="link"
-                  className="px-0 text-sm"
-                >
+                <Button type="button" variant="link" className="px-0 text-sm">
                   Forgot password?
                 </Button>
               </div>
