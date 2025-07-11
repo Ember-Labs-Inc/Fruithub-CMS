@@ -1,31 +1,60 @@
-
 import { useState } from "react";
 import { CMSLayout } from "../components/CMSLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Loader2 } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { Switch } from "../components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 import { Badge } from "../components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../components/ui/dialog";
 import { toast } from "../hooks/use-toast";
+import { useReduxAdmin } from "../hooks/useReduxAdmin";
+import { useAppDispatch } from "../redux/hooks";
+import { addAdmin } from "../redux/slices/adminSlice";
 
 const Settings = () => {
+  const dispatch = useAppDispatch();
+  const { admins, loading, reload } = useReduxAdmin();
+
   const [businessInfo, setBusinessInfo] = useState({
     name: "FreshMart Grocery",
     email: "admin@freshmart.com",
     phone: "+1 (555) 123-4567",
     address: "123 Market Street, Food City, FC 12345",
-    description: "Your neighborhood grocery store for fresh, quality products delivered to your doorstep.",
+    description:
+      "Your neighborhood grocery store for fresh, quality products delivered to your doorstep.",
   });
 
   const [appConfig, setAppConfig] = useState({
-    currency: "USD",
-    deliveryFee: "5.99",
-    freeDeliveryThreshold: "50.00",
+    currency: "UGX",
+    deliveryFee: "2000",
+    freeDeliveryThreshold: "50000",
     taxRate: "8.5",
     operatingHours: "8:00 AM - 10:00 PM",
     orderCutoffTime: "9:30 PM",
@@ -34,41 +63,35 @@ const Settings = () => {
   const [newAdmin, setNewAdmin] = useState({
     name: "",
     email: "",
+    gender: "",
     role: "",
   });
 
-  const adminUsers = [
-    {
-      id: 1,
-      name: "John Admin",
-      email: "john@freshmart.com",
-      role: "Super Admin",
-      status: "active",
-      lastLogin: "2024-01-15 10:30 AM",
-    },
-    {
-      id: 2,
-      name: "Sarah Manager",
-      email: "sarah@freshmart.com",
-      role: "Store Manager",
-      status: "active",
-      lastLogin: "2024-01-15 09:15 AM",
-    },
-    {
-      id: 3,
-      name: "Mike Support",
-      email: "mike@freshmart.com",
-      role: "Support Agent",
-      status: "inactive",
-      lastLogin: "2024-01-12 02:45 PM",
-    },
-  ];
-
   const notificationSettings = [
-    { id: "orderNotifications", label: "Order Notifications", description: "Receive notifications for new orders", enabled: true },
-    { id: "lowStockAlerts", label: "Low Stock Alerts", description: "Get alerted when products are running low", enabled: true },
-    { id: "customerSignups", label: "Customer Signups", description: "Notifications for new customer registrations", enabled: false },
-    { id: "salesReports", label: "Daily Sales Reports", description: "Automated daily sales summary emails", enabled: true },
+    {
+      id: "orderNotifications",
+      label: "Order Notifications",
+      description: "Receive notifications for new orders",
+      enabled: true,
+    },
+    {
+      id: "lowStockAlerts",
+      label: "Low Stock Alerts",
+      description: "Get alerted when products are running low",
+      enabled: true,
+    },
+    {
+      id: "customerSignups",
+      label: "Customer Signups",
+      description: "Notifications for new customer registrations",
+      enabled: false,
+    },
+    {
+      id: "salesReports",
+      label: "Daily Sales Reports",
+      description: "Automated daily sales summary emails",
+      enabled: true,
+    },
   ];
 
   const handleBusinessInfoSave = () => {
@@ -85,8 +108,13 @@ const Settings = () => {
     });
   };
 
-  const handleAddAdmin = () => {
-    if (!newAdmin.name || !newAdmin.email || !newAdmin.role) {
+  const handleAddAdmin = async () => {
+    if (
+      !newAdmin.name ||
+      !newAdmin.email ||
+      !newAdmin.gender ||
+      !newAdmin.role
+    ) {
       toast({
         title: "Error",
         description: "Please fill in all required fields.",
@@ -95,16 +123,31 @@ const Settings = () => {
       return;
     }
 
-    toast({
-      title: "Admin User Added",
-      description: `${newAdmin.name} has been added as ${newAdmin.role}.`,
-    });
+    const password = newAdmin.name.toLowerCase().replace(/\s+/g, ""); // e.g. John Doe -> johndoe
 
-    setNewAdmin({ name: "", email: "", role: "" });
+    try {
+      await dispatch(addAdmin({ ...newAdmin, password })).unwrap();
+
+      toast({
+        title: "Admin User Added",
+        description: `${newAdmin.name} has been added as ${newAdmin.role}. Default password: ${password}`,
+      });
+
+      setNewAdmin({ name: "", email: "", gender: "", role: "" });
+      reload();
+    } catch (error) {
+      toast({
+        title: "Error Adding Admin",
+        description: (error as string) || "Something went wrong.",
+        variant: "destructive",
+      });
+    }
   };
 
   const getStatusColor = (status: string) => {
-    return status === "active" ? "bg-success text-white" : "bg-zinc-200 text-muted-foreground";
+    return status === "active"
+      ? "bg-success text-white"
+      : "bg-zinc-200 text-muted-foreground";
   };
 
   return (
@@ -135,7 +178,12 @@ const Settings = () => {
                       <Input
                         id="businessName"
                         value={businessInfo.name}
-                        onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})}
+                        onChange={(e) =>
+                          setBusinessInfo({
+                            ...businessInfo,
+                            name: e.target.value,
+                          })
+                        }
                         className="bg-zinc-200"
                       />
                     </div>
@@ -146,7 +194,12 @@ const Settings = () => {
                         id="businessEmail"
                         type="email"
                         value={businessInfo.email}
-                        onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})}
+                        onChange={(e) =>
+                          setBusinessInfo({
+                            ...businessInfo,
+                            email: e.target.value,
+                          })
+                        }
                         className="bg-zinc-200"
                       />
                     </div>
@@ -156,7 +209,12 @@ const Settings = () => {
                       <Input
                         id="businessPhone"
                         value={businessInfo.phone}
-                        onChange={(e) => setBusinessInfo({...businessInfo, phone: e.target.value})}
+                        onChange={(e) =>
+                          setBusinessInfo({
+                            ...businessInfo,
+                            phone: e.target.value,
+                          })
+                        }
                         className="bg-zinc-200"
                       />
                     </div>
@@ -166,7 +224,12 @@ const Settings = () => {
                       <Textarea
                         id="businessAddress"
                         value={businessInfo.address}
-                        onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})}
+                        onChange={(e) =>
+                          setBusinessInfo({
+                            ...businessInfo,
+                            address: e.target.value,
+                          })
+                        }
                         rows={3}
                         className="bg-zinc-200"
                       />
@@ -175,11 +238,18 @@ const Settings = () => {
 
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="businessDescription">Business Description</Label>
+                      <Label htmlFor="businessDescription">
+                        Business Description
+                      </Label>
                       <Textarea
                         id="businessDescription"
                         value={businessInfo.description}
-                        onChange={(e) => setBusinessInfo({...businessInfo, description: e.target.value})}
+                        onChange={(e) =>
+                          setBusinessInfo({
+                            ...businessInfo,
+                            description: e.target.value,
+                          })
+                        }
                         rows={6}
                         className="bg-zinc-200"
                       />
@@ -189,15 +259,22 @@ const Settings = () => {
                       <Label>Logo Upload</Label>
                       <div className="mt-2 p-8 border-2 border-dashed rounded-lg text-center">
                         <div className="text-4xl mb-2">🛒</div>
-                        <p className="text-sm text-muted-foreground mb-2">Upload your business logo</p>
-                        <Button variant="outline" size="sm">Choose File</Button>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          Upload your business logo
+                        </p>
+                        <Button variant="outline" size="sm">
+                          Choose File
+                        </Button>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="mt-6">
-                  <Button onClick={handleBusinessInfoSave} className="bg-primary hover:bg-primary-hover">
+                  <Button
+                    onClick={handleBusinessInfoSave}
+                    className="bg-primary hover:bg-primary-hover"
+                  >
                     Save Business Information
                   </Button>
                 </div>
@@ -216,7 +293,12 @@ const Settings = () => {
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="currency">Currency</Label>
-                      <Select value={appConfig.currency} onValueChange={(value) => setAppConfig({...appConfig, currency: value})}>
+                      <Select
+                        value={appConfig.currency}
+                        onValueChange={(value) =>
+                          setAppConfig({ ...appConfig, currency: value })
+                        }
+                      >
                         <SelectTrigger className="bg-zinc-200">
                           <SelectValue />
                         </SelectTrigger>
@@ -234,18 +316,30 @@ const Settings = () => {
                       <Input
                         id="deliveryFee"
                         value={appConfig.deliveryFee}
-                        onChange={(e) => setAppConfig({...appConfig, deliveryFee: e.target.value})}
+                        onChange={(e) =>
+                          setAppConfig({
+                            ...appConfig,
+                            deliveryFee: e.target.value,
+                          })
+                        }
                         placeholder="5.99"
                         className="bg-zinc-200"
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor="freeDeliveryThreshold">Free Delivery Threshold</Label>
+                      <Label htmlFor="freeDeliveryThreshold">
+                        Free Delivery Threshold
+                      </Label>
                       <Input
                         id="freeDeliveryThreshold"
                         value={appConfig.freeDeliveryThreshold}
-                        onChange={(e) => setAppConfig({...appConfig, freeDeliveryThreshold: e.target.value})}
+                        onChange={(e) =>
+                          setAppConfig({
+                            ...appConfig,
+                            freeDeliveryThreshold: e.target.value,
+                          })
+                        }
                         placeholder="50.00"
                         className="bg-zinc-200"
                       />
@@ -258,7 +352,12 @@ const Settings = () => {
                       <Input
                         id="taxRate"
                         value={appConfig.taxRate}
-                        onChange={(e) => setAppConfig({...appConfig, taxRate: e.target.value})}
+                        onChange={(e) =>
+                          setAppConfig({
+                            ...appConfig,
+                            taxRate: e.target.value,
+                          })
+                        }
                         placeholder="8.5"
                         className="bg-zinc-200"
                       />
@@ -269,7 +368,12 @@ const Settings = () => {
                       <Input
                         id="operatingHours"
                         value={appConfig.operatingHours}
-                        onChange={(e) => setAppConfig({...appConfig, operatingHours: e.target.value})}
+                        onChange={(e) =>
+                          setAppConfig({
+                            ...appConfig,
+                            operatingHours: e.target.value,
+                          })
+                        }
                         placeholder="8:00 AM - 10:00 PM"
                         className="bg-zinc-200"
                       />
@@ -280,7 +384,12 @@ const Settings = () => {
                       <Input
                         id="orderCutoffTime"
                         value={appConfig.orderCutoffTime}
-                        onChange={(e) => setAppConfig({...appConfig, orderCutoffTime: e.target.value})}
+                        onChange={(e) =>
+                          setAppConfig({
+                            ...appConfig,
+                            orderCutoffTime: e.target.value,
+                          })
+                        }
                         placeholder="9:30 PM"
                         className="bg-zinc-200"
                       />
@@ -289,7 +398,10 @@ const Settings = () => {
                 </div>
 
                 <div className="mt-6">
-                  <Button onClick={handleAppConfigSave} className="bg-primary hover:bg-primary-hover">
+                  <Button
+                    onClick={handleAppConfigSave}
+                    className="bg-primary hover:bg-primary-hover"
+                  >
                     Save Configuration
                   </Button>
                 </div>
@@ -316,7 +428,9 @@ const Settings = () => {
                       <Input
                         id="adminName"
                         value={newAdmin.name}
-                        onChange={(e) => setNewAdmin({...newAdmin, name: e.target.value})}
+                        onChange={(e) =>
+                          setNewAdmin({ ...newAdmin, name: e.target.value })
+                        }
                         placeholder="Enter full name"
                         className="bg-zinc-200"
                       />
@@ -327,26 +441,59 @@ const Settings = () => {
                         id="adminEmail"
                         type="email"
                         value={newAdmin.email}
-                        onChange={(e) => setNewAdmin({...newAdmin, email: e.target.value})}
+                        onChange={(e) =>
+                          setNewAdmin({ ...newAdmin, email: e.target.value })
+                        }
                         placeholder="Enter email address"
                         className="bg-zinc-200"
                       />
                     </div>
                     <div>
+                      <Label htmlFor="adminGender">Gender</Label>
+                      <Select
+                        value={newAdmin.gender}
+                        onValueChange={(value) =>
+                          setNewAdmin({ ...newAdmin, gender: value })
+                        }
+                      >
+                        <SelectTrigger className="bg-zinc-200">
+                          <SelectValue placeholder="Select gender" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="MALE">Male</SelectItem>
+                          <SelectItem value="FEMALE">Female</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
                       <Label htmlFor="adminRole">Role</Label>
-                      <Select value={newAdmin.role} onValueChange={(value) => setNewAdmin({...newAdmin, role: value})}>
+                      <Select
+                        value={newAdmin.role}
+                        onValueChange={(value) =>
+                          setNewAdmin({ ...newAdmin, role: value })
+                        }
+                      >
                         <SelectTrigger className="bg-zinc-200">
                           <SelectValue placeholder="Select role" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Super Admin">Super Admin</SelectItem>
-                          <SelectItem value="Store Manager">Store Manager</SelectItem>
-                          <SelectItem value="Support Agent">Support Agent</SelectItem>
-                          <SelectItem value="Inventory Manager">Inventory Manager</SelectItem>
+                          <SelectItem value="ADMIN">Admin</SelectItem>
+                          <SelectItem value="STORE_MANAGER">
+                            Store Manager
+                          </SelectItem>
+                          <SelectItem value="SUPPORT_AGENT">
+                            Support Agent
+                          </SelectItem>
+                          <SelectItem value="INVENTORY_MANAGER">
+                            Inventory Manager
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                    <Button onClick={handleAddAdmin} className="w-full bg-primary hover:bg-primary-hover">
+                    <Button
+                      onClick={handleAddAdmin}
+                      className="w-full bg-primary hover:bg-primary-hover"
+                    >
                       Add Admin User
                     </Button>
                   </div>
@@ -360,34 +507,60 @@ const Settings = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {adminUsers.map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-4 bg-zinc-200 rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
-                          {user.name.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <div>
-                          <h3 className="font-semibold">{user.name}</h3>
-                          <p className="text-sm text-muted-foreground">{user.email}</p>
-                          <p className="text-xs text-muted-foreground">Last login: {user.lastLogin}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <Badge variant="outline" className="mb-2">{user.role}</Badge>
+                  {loading ? (
+                    <div className="flex justify-center py-10">
+                      <Loader2 className="animate-spin w-6 h-6 text-muted-foreground" />
+                    </div>
+                  ) : admins.length === 0 ? (
+                    <div className="text-center py-10 text-muted-foreground font-medium">
+                      No admins added yet.
+                    </div>
+                  ) : (
+                    admins.map((user) => (
+                      <div
+                        key={user.id}
+                        className="flex items-center justify-between p-4 bg-zinc-200 rounded-lg"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
+                            {user.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </div>
                           <div>
-                            <Badge className={getStatusColor(user.status)}>
-                              {user.status}
-                            </Badge>
+                            <h3 className="font-semibold">{user.name}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {user.email}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Last login: {user.lastLogin || "N/A"}
+                            </p>
                           </div>
                         </div>
-                        <div className="flex flex-col gap-2">
-                          <Button variant="outline" size="sm">Edit</Button>
-                          <Button variant="destructive" size="sm">Remove</Button>
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <Badge variant="outline" className="mb-2">
+                              {user.role}
+                            </Badge>
+                            <div>
+                              <Badge className={getStatusColor(user.status)}>
+                                {user.status}
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <Button variant="outline" size="sm">
+                              Edit
+                            </Button>
+                            <Button variant="destructive" size="sm">
+                              Remove
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -402,10 +575,15 @@ const Settings = () => {
               <CardContent>
                 <div className="space-y-6">
                   {notificationSettings.map((setting) => (
-                    <div key={setting.id} className="flex items-center justify-between p-4 bg-zinc-200 rounded-lg">
+                    <div
+                      key={setting.id}
+                      className="flex items-center justify-between p-4 bg-zinc-200 rounded-lg"
+                    >
                       <div className="space-y-1">
                         <h3 className="font-semibold">{setting.label}</h3>
-                        <p className="text-sm text-muted-foreground">{setting.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {setting.description}
+                        </p>
                       </div>
                       <Switch checked={setting.enabled} />
                     </div>
@@ -413,15 +591,25 @@ const Settings = () => {
                 </div>
 
                 <div className="mt-6 pt-6 border-t">
-                  <h3 className="font-semibold mb-4">📧 Email Template Settings</h3>
+                  <h3 className="font-semibold mb-4">
+                    📧 Email Template Settings
+                  </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="senderName">Sender Name</Label>
-                      <Input id="senderName" defaultValue="FreshMart Grocery" className="bg-zinc-200"/>
+                      <Input
+                        id="senderName"
+                        defaultValue="FreshMart Grocery"
+                        className="bg-zinc-200"
+                      />
                     </div>
                     <div>
                       <Label htmlFor="senderEmail">Sender Email</Label>
-                      <Input id="senderEmail" defaultValue="noreply@freshmart.com" className="bg-zinc-200"/>
+                      <Input
+                        id="senderEmail"
+                        defaultValue="noreply@freshmart.com"
+                        className="bg-zinc-200"
+                      />
                     </div>
                   </div>
                 </div>

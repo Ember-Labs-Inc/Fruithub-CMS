@@ -40,7 +40,7 @@ export const login = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await api.post('/users/login', { email, password });
+      const response = await api.post('/admins/login', { email, password });
 
       if (response.data?.id) {
         return response.data;
